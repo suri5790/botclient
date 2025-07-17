@@ -6,7 +6,6 @@ import { config } from "dotenv";
 import cors from "cors";
 import axios from "axios";
 import { io as ClientIO } from "socket.io-client";
-import getAudioFromText from "./utils/tts.js"; // ✅ TTS imported
 
 config();
 
@@ -45,7 +44,6 @@ app.post("/invite-bot", async (req, res) => {
     console.log(`📥 ${sender}: ${message}`);
 
     try {
-      // Get AI reply from OpenRouter
       const aiResponse = await axios.post("https://openrouter.ai/api/v1/chat/completions", {
         model: "meta-llama/llama-3-8b-instruct:nitro",
         messages: [
@@ -62,13 +60,10 @@ app.post("/invite-bot", async (req, res) => {
       const botReply = aiResponse.data.choices[0].message.content;
       console.log(`🤖 Reply: ${botReply}`);
 
-      // ✅ Get audio from TTS
-      const audioBase64 = await getAudioFromText(botReply);
-
-      // ✅ Emit text + audio
+      // Emit back plain text only (audio handled by frontend)
       socket.emit("bot-audio", {
         text: botReply,
-        audio: audioBase64,
+        audio: null
       });
     } catch (err) {
       console.error("AI error", err.message);
