@@ -1,10 +1,10 @@
 {
   "name": "botclient",
   "version": "1.0.0",
-  "description": "",
+  "description": "AI Bot that joins GD Room and responds with audio",
   "main": "botClient.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node botClient.js"
   },
   "keywords": [],
   "author": "",
