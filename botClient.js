@@ -1,4 +1,3 @@
-// botClient.js
 import express from "express";
 import { Server } from "socket.io";
 import { createServer } from "http";
@@ -43,6 +42,7 @@ app.post("/invite-bot", async (req, res) => {
     console.log(`📥 ${sender}: ${message}`);
 
     try {
+      // Generate AI reply from OpenRouter
       const aiResponse = await axios.post("https://openrouter.ai/api/v1/chat/completions", {
         model: "meta-llama/llama-3-8b-instruct:nitro",
         messages: [
@@ -59,19 +59,20 @@ app.post("/invite-bot", async (req, res) => {
       const botReply = aiResponse.data.choices[0].message.content;
       console.log(`🤖 Reply: ${botReply}`);
 
-      const audioRes = await axios.post("https://api.openai.com/v1/audio/speech", {
+      // Generate TTS using OpenRouter (TTS endpoint differs from OpenAI)
+      const ttsResponse = await axios.post("https://openrouter.ai/api/v1/audio/speech", {
         model: "tts-1",
         voice: "nova",
         input: botReply,
       }, {
         headers: {
-          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json"
         },
         responseType: "arraybuffer",
       });
 
-      const audioBase64 = Buffer.from(audioRes.data).toString("base64");
+      const audioBase64 = Buffer.from(ttsResponse.data).toString("base64");
 
       socket.emit("bot-audio", {
         text: botReply,
